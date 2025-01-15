@@ -12,6 +12,8 @@ from dataset.svhn_PLL import load_svhn
 
 import numpy as np
 import torch
+import torch_xla
+import torch_xla.core.xla_model as xm
 import torch.nn.functional as F
 import torch.optim as optim
 from torch.optim.lr_scheduler import LambdaLR
@@ -50,12 +52,12 @@ def main():
         model2 = WideResNet(28, args.num_classes, widen_factor=2, dropRate=0.0)             
     else:
         assert "Unknown arch"   
-
-    device = torch.device('cuda', args.gpu_id)
-    args.device=device 
-
-    model1 = model1.to(args.device)
-    model2 = model1.to(args.device)
+    
+    device = xm.xla_device()
+    args.device = device
+    
+    model1 = model1.to(device)
+    model2 = model1.to(device)
 
     logging.basicConfig(format='[%(asctime)s] - %(message)s',
                     datefmt='%Y/%m/%d %H:%M:%S',
